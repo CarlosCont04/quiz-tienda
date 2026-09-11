@@ -1,0 +1,39 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Quiz from '../components/Quiz.astro';
+import ResultDialog from '../components/ResultDialog.astro';
+import Icon from '../components/Icon.astro';
+import book from '../assets/libro.webp';
+---
+<Layout>
+  <Header />
+  <main>
+    <div class="container quiz-layout">
+      <section class="intro" aria-labelledby="intro-title">
+        <p class="eyebrow intro-eyebrow"><span></span> MENOS DEPENDENCIA. MÁS NEGOCIO.</p>
+        <h1 id="intro-title">Si tú te detienes,<br />¿tu negocio <span>también?</span></h1>
+        <p class="intro-description">Ponle un número a cuánto depende tu negocio de ti. Descubre qué área necesita estructura y por dónde empezar.</p>
+        <div class="test-facts"><span><strong>12</strong> preguntas</span><span><strong>5</strong> áreas clave</span><span><Icon name="chart" size={20} /> Resultado inmediato</span></div>
+        <div class="intro-note"><span class="note-line" aria-hidden="true"></span><p>Responde pensando en cómo funciona tu negocio <strong>hoy</strong>, no en cómo te gustaría que funcionara.</p></div>
+        <div class="book-signature">
+          <Image src={book} alt="Portada de El que tenga tienda que NO la ATIENDA, de Carolina Candedo y Jesús Rivas" width={76} height={114} class="book-cover" loading="lazy" />
+          <div><span class="small-eyebrow">EL QUE TENGA TIENDA</span><p>Un negocio que funcione.<br /><strong>También cuando tú no estés.</strong></p><span class="book-authors">Carolina Candedo & Jesús Rivas</span></div>
+        </div>
+      </section>
+      <Quiz />
+    </div>
+    <section class="reading-guide" aria-labelledby="guide-title">
+      <div class="container guide-inner"><div><p class="eyebrow">ASÍ LEERÁS TU RESULTADO</p><h2 id="guide-title">Un número. Un punto de partida.</h2></div>
+        <div class="result-levels">
+          <div class="level level-low"><span class="level-range">0–30 %</span><h3>Dependencia baja</h3><p>Tu siguiente reto es escalar.</p></div>
+          <div class="level level-medium"><span class="level-range">31–64 %</span><h3>Dependencia media</h3><p>Encuentra el cuello de botella.</p></div>
+          <div class="level level-high"><span class="level-range">65–100 %</span><h3>Dependencia alta</h3><p>Empieza a construir estructura.</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="container footer-inner"><p>© {new Date().getFullYear()} El que tenga tienda</p><a href="https://www.elquetengatienda.com/">Un negocio que dependa menos de ti <Icon name="external" size={14} /></a></div></footer>
+  <ResultDialog />
+</Layout>

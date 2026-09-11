@@ -1,0 +1,17 @@
+Options -Indexes
+DirectoryIndex index.html
+<IfModule php_module>
+  php_flag display_errors Off
+  php_flag display_startup_errors Off
+</IfModule>
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "DENY"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+<FilesMatch "\.(?:webp|css|js)$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "public, max-age=86400"
+  </IfModule>
+</FilesMatch>

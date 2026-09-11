@@ -1,0 +1,41 @@
+---
+import quiz from '../../shared/quiz.json';
+import Icon from './Icon.astro';
+---
+<dialog id="result-dialog" aria-labelledby="result-title" aria-describedby="result-thanks">
+  <div class="dialog-top"><span class="eyebrow">TU DIAGNÓSTICO INICIAL</span><button class="icon-button" type="button" id="close-result" aria-label="Cerrar resultado"><Icon name="close" /></button></div>
+  <div class="dialog-body">
+    <p id="result-thanks" class="thank-you">Gracias por responder el quiz</p>
+    <div class="result-heading">
+      <div class="score-dial" id="score-dial"><div><span id="result-percentage">0</span><span class="percent-sign">%</span></div></div>
+      <div><p class="result-kicker">Índice de dependencia</p><h2 id="result-title" tabindex="-1">Tu resultado</h2><p class="score-detail" id="result-score"></p></div>
+    </div>
+    <p id="result-description" class="result-description"></p>
+    <section class="area-breakdown" aria-labelledby="breakdown-title">
+      <div class="section-heading"><h3 id="breakdown-title">Tu negocio, área por área</h3><span>Más alto = más dependencia</span></div>
+      <ul class="area-results">
+        {quiz.areas.map(area => <li data-area={area.id}>
+          <div class="area-result-label"><span>{area.label}<span class="critical-tag" hidden>Prioridad</span></span><strong class="area-percent">0 %</strong></div>
+          <meter min="0" max="100" value="0" aria-label={`Dependencia en ${area.label}`}>0 %</meter>
+        </li>)}
+      </ul>
+    </section>
+    <section class="next-step-panel" aria-labelledby="critical-title"><p class="eyebrow">POR DÓNDE EMPEZAR</p><h3 id="critical-title"></h3><div id="critical-steps"></div></section>
+    <div class="diagnosis-link"><p>¿Quieres trabajar en lo que encontraste?</p><a class="button button-navy" href="https://www.elquetengatienda.com/">Conoce el Diagnóstico de Dependencia <Icon name="arrow" size={18} /></a><p class="small-text">Continúa en el sitio de El que tenga tienda.</p></div>
+    <section class="registration" aria-labelledby="registration-title">
+      <p class="eyebrow">REGISTRO OPCIONAL</p><h3 id="registration-title">Guarda este punto de partida a tu nombre.</h3>
+      <p>Registraremos tu nombre, tus respuestas y este resultado para identificar tu diagnóstico.</p>
+      <form id="registration-form">
+        <label class="field-label" for="participant-name">Tu nombre</label>
+        <input id="participant-name" class="text-input" name="name" type="text" autocomplete="name" minlength="2" maxlength="120" placeholder="¿Cómo te llamas?" required aria-describedby="name-hint" />
+        <span id="name-hint" class="small-text">Entre 2 y 120 caracteres.</span>
+        <div class="honeypot" aria-hidden="true"><label for="website">Sitio web</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off" /></div>
+        <label class="consent-label"><input name="consent" type="checkbox" required /><span>Acepto que se guarden mi nombre, mis respuestas y mi resultado para registrar este diagnóstico.</span></label>
+        <details class="data-use"><summary>Uso de tus datos</summary><p>El registro es opcional. La información se almacena para identificar tu diagnóstico; este formulario no te suscribe a correos ni envía mensajes. Para consultar o solicitar la eliminación de tu registro, escribe a <a href="mailto:contacto@elquetengatienda.com">contacto@elquetengatienda.com</a> e incluye tu nombre y la fecha del test.</p></details>
+        <button type="submit" class="button button-primary" id="save-result">Guardar mi resultado <Icon name="arrow" size={18} /></button>
+        <p class="form-message" id="save-status" role="status" aria-live="polite" tabindex="-1" hidden></p>
+      </form>
+    </section>
+    <p class="result-footnote">Este test es una primera lectura basada en tus respuestas; no sustituye un diagnóstico detallado de tu negocio.</p>
+  </div>
+</dialog>

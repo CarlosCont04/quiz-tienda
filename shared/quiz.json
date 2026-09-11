@@ -1,0 +1,31 @@
+{
+  "version": "dependencia-2026-1",
+  "title": "Test de Dependencia",
+  "maxScore": 36,
+  "areas": [
+    { "id": "finanzas", "label": "Finanzas", "maxScore": 9, "nextStep": "Empieza por tu punto de equilibrio y el margen real de cada producto. Sin eso, cada decisión que tomas es una apuesta." },
+    { "id": "operacion", "label": "Operación", "maxScore": 9, "nextStep": "Empieza por documentar los tres procesos que más te interrumpen. Es lo que te devuelve horas más rápido." },
+    { "id": "ventas", "label": "Ventas", "maxScore": 6, "nextStep": "Empieza por escribir tu proceso comercial. Mientras las ventas dependan de ti, no tienes un negocio: tienes un empleo." },
+    { "id": "marketing", "label": "Marketing", "maxScore": 6, "nextStep": "Empieza por definir tu mensaje y una fuente de clientes que no dependa de tu red personal ni de tu cara." },
+    { "id": "equipo", "label": "Equipo", "maxScore": 6, "nextStep": "Empieza por definir cómo se mide cada puesto. Casi nunca es falta de compromiso: es falta de claridad sobre qué es ganar." }
+  ],
+  "questions": [
+    { "id": 1, "area": "operacion", "text": "La última vez que te fuiste una semana completa sin conectarte, ¿qué pasó?", "options": ["Todo siguió igual; casi ni se notó", "Funcionó, con dos o tres consultas", "Me hablaron prácticamente todos los días", "No me he ido, o si me voy, el negocio se detiene"] },
+    { "id": 2, "area": "finanzas", "text": "Si te pregunto cuánto ganó tu negocio el mes pasado (utilidad, no ventas), ¿qué tan rápido lo sabes?", "options": ["Ahora mismo: lo tengo en mi tablero", "En un par de horas, revisando", "Tendría que pedírselo al contador y esperar", "No lo sé, y no sabría bien cómo calcularlo"] },
+    { "id": 3, "area": "finanzas", "text": "¿Sabes cuál de tus productos o servicios te deja más margen?", "options": ["Sí, tengo calculado el margen de cada uno", "Tengo una idea bastante clara", "Me lo imagino, pero nunca lo he calculado", "No lo sé"] },
+    { "id": 4, "area": "finanzas", "text": "Además de ti, ¿alguien más puede leer los números y entender cómo va el negocio?", "options": ["Sí, reviso indicadores con mi equipo", "Una persona podría, más o menos", "Solo mi contador, y en lenguaje fiscal", "Solo yo"] },
+    { "id": 5, "area": "ventas", "text": "Si tú no vendes ni das seguimiento esta semana, ¿el negocio vende?", "options": ["Sí: hay equipo y hay proceso", "Vende menos, pero vende", "Vende muy poco", "No vende nada"] },
+    { "id": 6, "area": "ventas", "text": "¿Tienes un proceso de ventas escrito que otra persona podría seguir?", "options": ["Sí, escrito y en uso", "Existe, pero está en mi cabeza", "Cada quien vende como puede", "No hay proceso; hay intuición"] },
+    { "id": 7, "area": "marketing", "text": "¿De dónde llegan tus clientes nuevos?", "options": ["De un sistema de captación que funciona sin mí", "De recomendaciones y algo de contenido", "Casi todo de mi red personal", "De donde caiga; no sé de dónde llegan"] },
+    { "id": 8, "area": "marketing", "text": "Si dejaras de dar la cara durante un mes, ¿seguirían llegando clientes?", "options": ["Sí: la marca ya no depende de mí", "Llegarían algunos menos", "Se caería bastante", "Se detendría por completo"] },
+    { "id": 9, "area": "operacion", "text": "¿Cuántas decisiones del día pasan por ti?", "options": ["Solo las estratégicas", "Las importantes", "La mayoría", "Todas, hasta las más pequeñas"] },
+    { "id": 10, "area": "operacion", "text": "¿Tus procesos clave están documentados?", "options": ["Sí, y el equipo los usa a diario", "Algunos, a medias", "Están en mi cabeza", "No hay procesos; hay costumbre"] },
+    { "id": 11, "area": "equipo", "text": "¿Tu equipo sabe cómo se mide su trabajo?", "options": ["Sí: cada quien tiene indicadores claros", "Más o menos; se los he dicho", "Saben sus tareas, no sus resultados", "No, o todavía no tengo equipo"] },
+    { "id": 12, "area": "equipo", "text": "Cuando algo sale mal, ¿tu equipo resuelve o te busca?", "options": ["Resuelve y después me informa", "Resuelve lo pequeño; me busca para lo demás", "Casi siempre me busca", "Absolutamente todo me llega a mí"] }
+  ],
+  "results": [
+    { "key": "baja", "min": 0, "max": 30, "title": "Dependencia baja", "description": "Tu negocio ya camina sin ti buena parte del tiempo. Construiste algo que funciona, y eso no es común. Tu siguiente reto es distinto al de la mayoría: que el negocio crezca sin que tú crezcas en horas. Aquí el trabajo es de escala, equipo y estrategia — no de rescate." },
+    { "key": "media", "min": 31, "max": 64, "title": "Dependencia media", "description": "Tu negocio aguanta unos días sin ti, pero no semanas. Ya hay estructura en algunas áreas y en otras no, y eso es exactamente lo que te tiene atorado: el techo de tu negocio hoy eres tú. La buena noticia es que a este nivel el cuello de botella casi siempre está concentrado en una sola área. Encuéntrala y el resto se destraba." },
+    { "key": "alta", "min": 65, "max": 100, "title": "Dependencia alta", "description": "Tu negocio no puede operar sin ti casi ningún día. Esto no es falta de esfuerzo — probablemente trabajas más que nadie. Es falta de estructura: hoy no tienes un negocio, tienes un empleo muy demandante que no se puede vender, ni heredar, ni dejar. Se arregla, pero en un orden concreto, y no todo a la vez." }
+  ]
+}

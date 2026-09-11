@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+backend/config.local.php
+.runtime/
+test-results/
+playwright-report/
+*.log
+.DS_Store

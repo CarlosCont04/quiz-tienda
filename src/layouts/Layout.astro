@@ -1,0 +1,19 @@
+---
+import '../styles/global.css';
+interface Props { title?: string; }
+const { title = 'Test de Dependencia | El que tenga tienda' } = Astro.props;
+---
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Descubre cuánto depende tu negocio de ti. Responde 12 preguntas y conoce tu índice de dependencia, el desglose por área y por dónde empezar." />
+    <meta name="theme-color" content="#102a43" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#quiz">Ir al test</a>
+    <slot />
+  </body>
+</html>

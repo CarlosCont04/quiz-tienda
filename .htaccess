@@ -1,0 +1,8 @@
+Options -Indexes
+RewriteEngine On
+# Solo el resultado de la compilación es público.
+RewriteRule (^|/)\. - [F,L]
+RewriteRule ^(?:backend|database|shared|src|scripts|tests|docs|node_modules|public)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:package.*\.json|astro\.config\.mjs|tsconfig\.json|README\.md|playwright\.config\.ts)$ - [F,L,NC]
+RewriteRule ^$ dist/ [L]
+RewriteRule ^(?!dist/)(.*)$ dist/$1 [L]

@@ -1,0 +1,45 @@
+---
+import quiz from '../../shared/quiz.json';
+import Icon from './Icon.astro';
+---
+<section id="quiz" class="quiz-card" aria-label="Test de Dependencia" data-api-base={`${import.meta.env.BASE_URL}api/`}>
+  <div class="quiz-card-top"><span class="eyebrow">TEST DE DEPENDENCIA</span><span class="quiz-edition">12 preguntas</span></div>
+  <div class="progress-meta"><span id="step-label">Pregunta 01 de 12</span><span id="answered-label">0 de 12 respondidas</span></div>
+  <progress id="quiz-progress" value="0" max="12" aria-label="Preguntas respondidas">0 de 12</progress>
+  <form id="quiz-form" novalidate>
+    {quiz.questions.map((question, index) => (
+      <fieldset class="question-step" data-step={index} hidden={index !== 0} disabled={index !== 0}>
+        <legend>
+          <span class="area-label"><span class="area-dot" aria-hidden="true"></span>{quiz.areas.find(area => area.id === question.area)?.label}</span>
+          <span class="question-title" id={index === 0 ? 'quiz-title' : `question-${question.id}`} tabindex="-1">{question.text}</span>
+        </legend>
+        <p class="question-hint">Elige la opción que más se parece a tu realidad.</p>
+        <div class="answer-list">
+          {question.options.map((option, value) => (
+            <label class="answer-option">
+              <input type="radio" name={`question-${question.id}`} value={value} required />
+              <span class="answer-letter" aria-hidden="true">{['A', 'B', 'C', 'D'][value]}</span>
+              <span class="answer-text">{option}</span>
+              <span class="answer-check" aria-hidden="true"><Icon name="check" size={16} /></span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    ))}
+    <p id="question-error" class="form-message error-message" role="alert" hidden>Selecciona una respuesta para continuar.</p>
+    <div class="quiz-navigation">
+      <button type="button" id="previous-question" class="button button-quiet" disabled><Icon name="back" size={18} /> Anterior</button>
+      <button type="submit" id="next-question" class="button button-primary"><span id="next-label">Siguiente</span><Icon name="arrow" size={18} /></button>
+    </div>
+  </form>
+  <div id="quiz-complete" hidden>
+    <span class="completion-mark"><Icon name="check" size={28} /></span>
+    <h2 tabindex="-1" id="completed-title">Ya tienes un punto de partida.</h2>
+    <p>Tu resultado incluye tu índice de dependencia y el siguiente paso para tu negocio.</p>
+    <button type="button" id="reopen-result" class="button button-primary">Ver mi resultado <Icon name="chart" /></button>
+    <button type="button" id="restart-quiz" class="button button-quiet">Volver a hacer el test</button>
+  </div>
+  <div class="quiz-assurance"><Icon name="lock" size={15} /><span>Tu resultado completo, sin pedirte un correo.</span></div>
+  <noscript><p class="noscript-message">Activa JavaScript para responder el test y calcular tu resultado.</p></noscript>
+</section>
+<script>import '../scripts/quiz.ts';</script>
