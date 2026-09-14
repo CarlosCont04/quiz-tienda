@@ -7,7 +7,7 @@ import { randomUUID } from 'node:crypto';
 import { setTimeout } from 'node:timers/promises';
 
 const php = process.env.PHP_BINARY || (existsSync('C:/xampp/php/php.exe') ? 'C:/xampp/php/php.exe' : 'php');
-const env = { ...process.env, DB_NAME: 'quiz_tienda_test' };
+const env = { ...process.env, DB_NAME: 'quiz_tienda_test', EMAIL_TRANSPORT: 'log' };
 const base = 'http://127.0.0.1:8083/api/';
 const ids = [];
 let server;
@@ -55,6 +55,7 @@ test('guarda los tres niveles, 12 respuestas y nombre Unicode en MySQL', async (
     const body = await response.json();
     assert.equal(body.message, 'Gracias por responder el quiz');
     assert.equal(body.result.key, key); assert.equal(body.result.percentage, percentage);
+    assert.equal(existsSync(resolve('.runtime/mail-log', `${input.requestId}.html`)), true);
     const record = JSON.parse(runPhp(['tests/db-record.php', 'read', input.requestId]));
     assert.equal(record.full_name, input.name);
     assert.equal(Number(record.total_score), value * 12);
