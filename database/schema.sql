@@ -32,3 +32,17 @@ CREATE TABLE IF NOT EXISTS quiz_answers (
     CONSTRAINT valid_points CHECK (points BETWEEN 0 AND 3),
     CONSTRAINT valid_area CHECK ((question_id IN (2,3,4) AND area_key = 'finanzas') OR (question_id IN (1,9,10) AND area_key = 'operacion') OR (question_id IN (5,6) AND area_key = 'ventas') OR (question_id IN (7,8) AND area_key = 'marketing') OR (question_id IN (11,12) AND area_key = 'equipo'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS quiz_email_deliveries (
+    submission_id BIGINT UNSIGNED NOT NULL,
+    recipient VARCHAR(254) NOT NULL,
+    status ENUM('pending', 'sent') NOT NULL DEFAULT 'pending',
+    attempts SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    last_error VARCHAR(120) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sent_at DATETIME NULL,
+    PRIMARY KEY (submission_id),
+    KEY by_status (status, created_at),
+    CONSTRAINT email_submission FOREIGN KEY (submission_id) REFERENCES quiz_submissions(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

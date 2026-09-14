@@ -11,6 +11,10 @@ function config(): array
     if (is_file(__DIR__ . '/config.local.php')) {
         $config = array_replace($config, require __DIR__ . '/config.local.php');
     }
+    foreach (['email_transport', 'email_recipient', 'email_from', 'email_from_name', 'smtp_host', 'smtp_port', 'smtp_encryption', 'smtp_username', 'smtp_password'] as $key) {
+        $value = getenv(strtoupper($key));
+        if ($value !== false) { $config[$key] = $value; }
+    }
     foreach (['host', 'port', 'name', 'user', 'password'] as $key) {
         $value = getenv('DB_' . strtoupper($key));
         if ($value !== false) {

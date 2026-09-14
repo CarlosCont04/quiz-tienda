@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/backend/http.php';
 require_once dirname(__DIR__, 2) . '/backend/quiz.php';
 require_once dirname(__DIR__, 2) . '/backend/database.php';
+require_once dirname(__DIR__, 2) . '/backend/notifications.php';
 
 requireMethod('POST');
 if (strtolower(trim(explode(';', $_SERVER['CONTENT_TYPE'] ?? '')[0])) !== 'application/json') {
@@ -40,17 +41,18 @@ $result = calculateResult($submission['answers']);
 $payloadHash = hash('sha256', json_encode($submission, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 $pdo = database();
 $findExisting = function () use ($pdo, $submission, $sessionHash, $payloadHash): ?array {
-    $query = $pdo->prepare('SELECT result_json, payload_hash, session_hash FROM quiz_submissions WHERE request_id = ?');
+    $query = $pdo->prepare('SELECT id, result_json, payload_hash, session_hash FROM quiz_submissions WHERE request_id = ?');
     $query->execute([$submission['requestId']]);
     $existing = $query->fetch();
     if (!$existing) return null;
     if (!hash_equals($existing['session_hash'], $sessionHash) || !hash_equals($existing['payload_hash'], $payloadHash)) {
         jsonResponse(['message' => 'Este intento ya está registrado con otros datos. Usa los datos originales para reintentar o inicia otro test.'], 409);
     }
-    return json_decode($existing['result_json'], true, 512, JSON_THROW_ON_ERROR);
+    return ['id' => (int) $existing['id'], 'result' => json_decode($existing['result_json'], true, 512, JSON_THROW_ON_ERROR)];
 };
 if ($existing = $findExisting()) {
-    jsonResponse(['message' => 'Gracias por responder el quiz', 'result' => $existing]);
+    deliverQuizEmail($pdo, $existing['id'], $submission, $existing['result']);
+    jsonResponse(['message' => 'Gracias por responder el quiz', 'result' => $existing['result']]);
 }
 try {
     $pdo->beginTransaction();
@@ -61,12 +63,15 @@ try {
     foreach (quizDefinition()['questions'] as $question) {
         $saveAnswer->execute([$id, $question['id'], $question['area'], $submission['answers'][$question['id']]]);
     }
+    queueQuizEmail($pdo, $id);
     $pdo->commit();
 } catch (Throwable $error) {
     if ($pdo->inTransaction()) $pdo->rollBack();
     if ($error instanceof PDOException && (int) ($error->errorInfo[1] ?? 0) === 1062 && ($existing = $findExisting())) {
-        jsonResponse(['message' => 'Gracias por responder el quiz', 'result' => $existing]);
+        deliverQuizEmail($pdo, $existing['id'], $submission, $existing['result']);
+        jsonResponse(['message' => 'Gracias por responder el quiz', 'result' => $existing['result']]);
     }
     throw $error;
 }
+deliverQuizEmail($pdo, $id, $submission, $result);
 jsonResponse(['message' => 'Gracias por responder el quiz', 'result' => $result], 201);
