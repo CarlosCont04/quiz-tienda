@@ -62,7 +62,7 @@ El documento **Test de Dependencia - contenido y logica.docx** es la fuente de l
 4. El resultado completo se muestra **antes de pedir datos**. El nombre y la aceptación del uso de datos se solicitan en un registro opcional dentro de esa ventana; no se pide correo.
 5. Al registrar el nombre, PHP valida todas las respuestas, vuelve a calcular el resultado y guarda nombre, respuestas, resultado, versión y fecha en una transacción SQL.
 
-Las respuestas permanecen en memoria durante el test; cerrar o recargar la página descarta lo que aún no se haya registrado. Resolver el test sin completar el registro opcional no crea una fila en SQL. No se envían correos ni mensajes ni se suscribe al visitante a campañas. Si falla el registro, el resultado sigue disponible y se puede reintentar.
+Las respuestas permanecen en memoria durante el test; cerrar o recargar la página descarta lo que aún no se haya registrado. Resolver el test sin completar el registro opcional no crea una fila en SQL. Al guardar el registro, se envía al destinatario configurado un correo con el nombre, las respuestas y el resultado; no se suscribe al visitante a campañas. Si falla el correo, el registro queda pendiente y se puede reintentar.
 
 | Índice mostrado | Puntos | Resultado |
 | --- | --- | --- |
@@ -137,3 +137,9 @@ npm.cmd run build:xampp
 Repositorio: **https://github.com/CarlosCont04/quiz-tienda**. Los originales WebP, PNG, JPG, fuentes y otros recursos binarios se administran con `.gitattributes` y Git LFS; JSON, código y lockfile con Git. Se excluyen dependencias, salida compilada, secretos, sesiones y temporales. El documento de entrada no se copia al repositorio.
 
 Referencias: [sitio de El que tenga tienda](https://elquetengatienda.com/), [documentación oficial de Astro](https://docs.astro.build/en/install-and-setup/) y [sentencias preparadas de PDO](https://www.php.net/manual/en/pdo.prepared-statements.php).
+
+## Correo de resultados
+
+El envío usa SMTP autenticado con TLS. Durante pruebas, `email_recipient` debe permanecer en `aldoemonterm@gmail.com`; al aprobarlas se cambia a `carolina.candedo@elquetenga.com`. Copiar las credenciales del proveedor SMTP únicamente en `backend/config.local.php` o definir `SMTP_HOST`, `SMTP_PORT`, `SMTP_ENCRYPTION`, `SMTP_USERNAME` y `SMTP_PASSWORD` como variables de proceso. También se admiten `EMAIL_TRANSPORT`, `EMAIL_RECIPIENT`, `EMAIL_FROM` y `EMAIL_FROM_NAME`. Nunca subir contraseñas ni contraseñas de aplicación a Git.
+
+Cada registro crea una entrega pendiente vinculada a la participación. Tras una entrega correcta se marca como enviada; si SMTP falla, el usuario recibe un error controlado y puede reintentar sin crear un registro ni correo duplicado.
