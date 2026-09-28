@@ -6,7 +6,6 @@ dist/
 !.env.example
 backend/config.local.php
 .runtime/
-.vercel/
 test-results/
 playwright-report/
 *.log

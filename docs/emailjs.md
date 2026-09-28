@@ -36,8 +36,6 @@ EmailJS documenta la habilitación de solicitudes no procedentes de navegador en
 
 ## 4. Configurar PHP
 
-Esta sección es para XAMPP. En Vercel, configurar las mismas cuatro variables `EMAILJS_*` en **Project Settings → Environment Variables** y volver a desplegar. Las funciones Node.js llaman al mismo servicio y usan la misma plantilla; consultar [la guía de Vercel](vercel.md). No se necesita PHP ni SQL allí.
-
 Editar `backend/config.local.php` (excluido de Git). Para esta integración basta:
 
 ```php

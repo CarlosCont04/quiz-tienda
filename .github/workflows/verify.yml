@@ -18,11 +18,6 @@ jobs:
           php-version: '8.2'
           extensions: curl, mbstring
       - run: npm ci
-      - run: npm run check
       - run: npm test
       - run: npm run test:api
-      - run: npm run test:vercel
-      - run: npm run build
-        env:
-          VERCEL: '1'
       - run: npm run build:xampp
