@@ -4,17 +4,18 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.12.0"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:frontend": "astro dev --host 127.0.0.1",
-    "build": "astro check && astro build",
+    "build": "node scripts/check-assets.mjs && astro build",
     "build:xampp": "node scripts/build-xampp.mjs",
     "preview": "node scripts/php.mjs dist",
     "start": "node scripts/php.mjs dist",
     "test": "node scripts/php.mjs test && node --test tests/scoring.test.ts",
     "test:api": "node --test tests/api.test.mjs",
+    "test:vercel": "node --test tests/vercel.test.ts",
     "check": "astro check"
   },
   "dependencies": {
@@ -24,5 +25,8 @@
     "@astrojs/check": "^0.9.10",
     "@types/node": "^24.13.4",
     "typescript": "^5.9.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }

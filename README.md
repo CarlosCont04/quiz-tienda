@@ -1,6 +1,6 @@
 # Test de Dependencia · El que tenga tienda
 
-Quiz en español con Astro, TypeScript y PHP 8.2. Al completar las doce preguntas y enviar el registro con nombre y consentimiento, el servidor recalcula el diagnóstico y lo envía mediante EmailJS. Se conserva la plantilla HTML azul marino, naranja y crema del proyecto.
+Quiz en español con Astro y TypeScript, funciones Node.js para Vercel y PHP 8.2 para XAMPP. Al completar las doce preguntas y enviar el registro con nombre y consentimiento, el servidor recalcula el diagnóstico y lo envía mediante EmailJS. Ambas versiones utilizan la misma plantilla HTML azul marino, naranja y crema del proyecto.
 
 - Destinataria: **carolina.candedo@elquetenga.com**.
 - Remitente que debe conectarse y autorizarse en EmailJS: **jesus.rivas01@elquetengatienda.com**.
@@ -10,7 +10,7 @@ Quiz en español con Astro, TypeScript y PHP 8.2. Al completar las doce pregunta
 
 ## Instalación y configuración
 
-Requiere Node.js 22.12 o posterior, Git LFS y PHP 8.2 con `curl` y `mbstring`. Para enviar se necesita acceso HTTPS a EmailJS y una cuenta con el servicio de correo autorizado.
+Requiere Node.js 24.x y Git LFS; el modo XAMPP y las pruebas de compatibilidad requieren además PHP 8.2 con `curl` y `mbstring`. Para enviar se necesita acceso HTTPS a EmailJS y una cuenta con el servicio de correo autorizado. La rama de Node queda fijada en `package.json` y `.nvmrc`; el script de instalación de `esbuild@0.28.2` está autorizado explícitamente en `allowScripts`.
 
 ```powershell
 npm.cmd ci
@@ -25,6 +25,10 @@ Completar las cuatro claves `emailjs_*` en el archivo local. No reemplazar un ar
 **Seguir [la guía de EmailJS](docs/emailjs.md)** para conectar al remitente, crear la plantilla conservando el HTML y obtener las claves. El archivo local está excluido de Git. Las variables de proceso `EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, `EMAILJS_PUBLIC_KEY` y `EMAILJS_PRIVATE_KEY` tienen prioridad. PHP no carga archivos `.env`; estos se reservan a configuración pública de Astro. No colocar credenciales en `PUBLIC_*`.
 
 ## Desarrollo y publicación
+
+Para **Vercel**, consultar [configuración del despliegue y EmailJS](docs/vercel.md). `vercel.json` configura la compilación y las funciones de servidor; solo es necesario habilitar Git LFS y configurar las cuatro variables de EmailJS. No se utiliza PHP ni SQL en Vercel.
+
+`npm run build` compila los recursos. La comprobación de tipos está separada en `npm run check` y se ejecuta en GitHub Actions. Así el despliegue no depende de que finalice el proceso de `astro check`.
 
 ```powershell
 npm.cmd run dev
@@ -76,19 +80,21 @@ Las áreas críticas se comparan por proporción exacta; se conservan empates. C
 - `GET /api/session.php`: cookie HttpOnly/SameSite y token CSRF.
 - `POST /api/submit.php`: JSON con `requestId` UUID v4, `name`, `consent: true`, `website: ""` y doce `answers: [{questionId, value}]`. Requiere cookie y `X-CSRF-Token`.
 - `201`: EmailJS aceptó el envío. `200`: envío ya confirmado en esa sesión.
-- `403`: sesión/origen inválido. `409`: UUID con datos diferentes dentro de la sesión. `413`: más de 16 KB. `415`: formato incorrecto. `422`: validación. `429`: límite. `503`: configuración o envío no confirmado.
+- `403`: sesión/origen inválido. `409`: UUID con datos diferentes, envío concurrente o entrega pendiente de verificar. `413`: más de 16 KB. `415`: formato incorrecto. `422`: validación. `429`: límite. `503`: configuración o envío no confirmado.
 
-Los puntajes y destinatarios del navegador no se consideran fiables: PHP valida y calcula el resultado, genera el HTML con valores escapados y llama a la API HTTPS fija de EmailJS. Las claves no se incluyen en el JavaScript generado. El remitente efectivo debe pertenecer al servicio autorizado en EmailJS.
+Los puntajes y destinatarios del navegador no se consideran fiables: el servidor (PHP en XAMPP, Node en Vercel) valida y calcula el resultado, genera el HTML con valores escapados y llama a la API HTTPS fija de EmailJS. Las claves no se incluyen en el JavaScript del navegador. El remitente efectivo debe pertenecer al servicio autorizado en EmailJS.
 
-La única persistencia local del flujo es la sesión: CSRF, tiempos para limitar intentos y UUID/huella/fecha/estado de los envíos. No se guardan nombres, respuestas ni resultados completos en archivos o tablas. Las huellas expiran a las 24 horas o antes si expira la sesión. La copia del registro queda en el buzón y EmailJS procesa el contenido según la configuración de la cuenta.
+En XAMPP, la única persistencia local del flujo es la sesión PHP: CSRF, tiempos para limitar intentos y UUID/huella/fecha/estado de los envíos. En Vercel se usan cookies firmadas con metadatos de confirmación y memoria temporal acotada por instancia, sin archivos de sesión. No se guardan nombres, respuestas ni resultados completos en archivos, cookies o tablas. Las huellas expiran a las 24 horas o antes si expira la sesión. La copia del registro queda en el buzón y EmailJS procesa el contenido según la configuración de la cuenta.
 
-El bloqueo de sesión evita reenvíos simultáneos y los reintentos después de una confirmación. No hay cola persistente, reintentos automáticos ni garantía de entrega exactamente una vez: una sesión nueva, una pérdida de sesión o un corte después de que EmailJS acepte pero antes de guardar la confirmación puede ocasionar duplicados. El UUID incluido en el correo permite identificarlos. Un HTTP 200 de EmailJS acredita aceptación, no llegada a bandeja de entrada.
+El bloqueo de sesión PHP evita reenvíos simultáneos en XAMPP. En Vercel, los envíos simultáneos se bloquean dentro de cada instancia y una cookie firmada permite reconocer los últimos ocho registros confirmados entre instancias. No hay cola persistente, reintentos automáticos ni garantía de entrega exactamente una vez: una sesión nueva, una pérdida de confirmación o peticiones simultáneas entre instancias pueden ocasionar duplicados. El límite de intentos de Vercel es por instancia, no global. El UUID incluido en el correo permite identificar registros repetidos. Un HTTP 200 de EmailJS acredita aceptación, no llegada a bandeja de entrada. Ver [límites y configuración de Vercel](docs/vercel.md).
 
 ## Verificación
 
 ```powershell
+npm.cmd run check
 npm.cmd test
 npm.cmd run test:api
+npm.cmd run test:vercel
 npm.cmd run build:xampp
 ```
 
@@ -98,11 +104,14 @@ Las pruebas cubren reglas PHP, equivalencia con TypeScript y el flujo HTTP con u
 
 - `src/`: interfaz Astro, estilos y cálculo en el navegador.
 - `shared/quiz.json`: definición del cuestionario.
+- `shared/quiz-email.html`: plantilla HTML compartida por PHP y Node.
+- `api/` y `server/`: funciones Vercel, validación, cookies firmadas y transporte EmailJS.
 - `backend/submission.php`: validación, sesión y coordinación del envío.
-- `backend/mailer.php`: plantilla conservada y transporte EmailJS.
+- `backend/mailer.php`: composición del correo y transporte EmailJS para XAMPP.
 - `backend/config.example.php`: claves necesarias, sin secretos.
 - `public/api/`: endpoints PHP.
 - `tests/`: reglas e integración simulada.
 - `docs/emailjs.md`: configuración y comprobación de entrega real.
+- `docs/vercel.md` y `vercel.json`: despliegue de Astro y funciones Node en Vercel.
 
 Los recursos binarios siguen administrados con Git LFS. Dependencias, salida compilada, configuración local y temporales permanecen excluidos de Git.
