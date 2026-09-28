@@ -124,7 +124,7 @@ element('#restart-quiz').addEventListener('click', () => {
   answers.clear(); completedAnswers = []; requestId = ''; saved = false;
   form.reset(); registration.reset(); name.setCustomValidity('');
   registration.querySelectorAll<HTMLInputElement>('input').forEach(input => { input.disabled = false; });
-  save.disabled = false; save.textContent = 'Guardar mi resultado'; status.hidden = true;
+  save.disabled = false; save.textContent = 'Enviar mi diagnóstico'; status.hidden = true;
   form.hidden = false; element('#quiz-complete').hidden = true;
   updateProgress(); showQuestion(0);
 });
@@ -143,7 +143,7 @@ registration.addEventListener('submit', async event => {
     name.setCustomValidity('Escribe un nombre válido de 2 a 120 caracteres.'); name.reportValidity(); return;
   }
   if (!registration.reportValidity()) return;
-  saving = true; save.disabled = true; save.textContent = 'Guardando…';
+  saving = true; save.disabled = true; save.textContent = 'Enviando…';
   element<HTMLButtonElement>('#restart-quiz').disabled = true;
   status.hidden = true;
   registration.setAttribute('aria-busy', 'true');
@@ -160,18 +160,18 @@ registration.addEventListener('submit', async event => {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken }, body: JSON.stringify(payload),
       });
       if (response.status === 403 && attempt === 0) { csrfToken = ''; continue; }
-      if (!response.ok) throw new Error(data.message || 'No pudimos guardar tu resultado. Intenta de nuevo.');
+      if (!response.ok) throw new Error(data.message || 'No pudimos enviar tu diagnóstico. Intenta de nuevo.');
       renderResult(data.result as Result);
       saved = true;
       status.classList.remove('error-message');
-      status.textContent = `Listo, ${cleanName}. Tu nombre, tus respuestas y tu resultado quedaron registrados. Gracias por responder el quiz.`;
-      save.textContent = 'Resultado guardado';
+      status.textContent = `Listo, ${cleanName}. Tu diagnóstico fue aceptado para envío al correo del equipo. Gracias por responder el quiz.`;
+      save.textContent = 'Diagnóstico enviado';
       break;
     }
   } catch (caught) {
     status.classList.add('error-message');
-    status.textContent = caught instanceof Error && !['TypeError', 'TimeoutError', 'SyntaxError', 'AbortError'].includes(caught.name) ? caught.message : 'No pudimos conectar para guardar. Tu resultado sigue aquí; vuelve a intentarlo.';
-    save.textContent = 'Reintentar registro';
+    status.textContent = caught instanceof Error && !['TypeError', 'TimeoutError', 'SyntaxError', 'AbortError'].includes(caught.name) ? caught.message : 'No pudimos confirmar el envío. Tu resultado sigue aquí; vuelve a intentarlo.';
+    save.textContent = 'Reintentar envío';
   } finally {
     saving = false; save.disabled = saved;
     element<HTMLButtonElement>('#restart-quiz').disabled = false;

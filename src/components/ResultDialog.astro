@@ -23,16 +23,16 @@ import Icon from './Icon.astro';
     <section class="next-step-panel" aria-labelledby="critical-title"><p class="eyebrow">POR DÓNDE EMPEZAR</p><h3 id="critical-title"></h3><div id="critical-steps"></div></section>
     <div class="diagnosis-link"><p>¿Quieres trabajar en lo que encontraste?</p><a class="button button-navy" href="https://www.elquetengatienda.com/">Conoce el Diagnóstico de Dependencia <Icon name="arrow" size={18} /></a><p class="small-text">Continúa en el sitio de El que tenga tienda.</p></div>
     <section class="registration" aria-labelledby="registration-title">
-      <p class="eyebrow">REGISTRO OPCIONAL</p><h3 id="registration-title">Guarda este punto de partida a tu nombre.</h3>
-      <p>Registraremos tu nombre, tus respuestas y este resultado para identificar tu diagnóstico.</p>
+      <p class="eyebrow">REGISTRO DEL DIAGNÓSTICO</p><h3 id="registration-title">Envía este punto de partida a nuestro equipo.</h3>
+      <p>Completa tu nombre y autoriza el envío de tus respuestas y resultado para registrar tu diagnóstico por correo.</p>
       <form id="registration-form">
         <label class="field-label" for="participant-name">Tu nombre</label>
         <input id="participant-name" class="text-input" name="name" type="text" autocomplete="name" minlength="2" maxlength="120" placeholder="¿Cómo te llamas?" required aria-describedby="name-hint" />
         <span id="name-hint" class="small-text">Entre 2 y 120 caracteres.</span>
         <div class="honeypot" aria-hidden="true"><label for="website">Sitio web</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off" /></div>
-        <label class="consent-label"><input name="consent" type="checkbox" required /><span>Acepto que se guarden mi nombre, mis respuestas y mi resultado para registrar este diagnóstico.</span></label>
-        <details class="data-use"><summary>Uso de tus datos</summary><p>El registro es opcional. Al guardarlo, tu nombre, respuestas y resultado se almacenan y se envían al equipo de El que tenga tienda para registrar tu diagnóstico. Este formulario no te suscribe a correos ni envía mensajes. Para consultar o solicitar la eliminación de tu registro, escribe a <a href="mailto:contacto@elquetengatienda.com">contacto@elquetengatienda.com</a> e incluye tu nombre y la fecha del test.</p></details>
-        <button type="submit" class="button button-primary" id="save-result">Guardar mi resultado <Icon name="arrow" size={18} /></button>
+        <label class="consent-label"><input name="consent" type="checkbox" required /><span>Acepto enviar mi nombre, mis respuestas y mi resultado al equipo de El que tenga tienda para registrar este diagnóstico.</span></label>
+        <details class="data-use"><summary>Uso de tus datos</summary><p>Al enviar el registro, EmailJS procesa tu nombre, las respuestas y el resultado para enviarlos por correo a Carolina Candedo, del equipo de El que tenga tienda. La copia queda en el correo del equipo; este formulario no te suscribe a campañas ni te envía mensajes. Para consultar o solicitar la eliminación de tu registro, escribe a <a href="mailto:contacto@elquetengatienda.com">contacto@elquetengatienda.com</a> e incluye tu nombre y la fecha del test.</p></details>
+        <button type="submit" class="button button-primary" id="save-result">Enviar mi diagnóstico <Icon name="arrow" size={18} /></button>
         <p class="form-message" id="save-status" role="status" aria-live="polite" tabindex="-1" hidden></p>
       </form>
     </section>

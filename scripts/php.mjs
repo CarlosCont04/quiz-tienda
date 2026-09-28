@@ -5,7 +5,6 @@ import { resolve } from 'node:path';
 export const php = process.env.PHP_BINARY || (process.platform === 'win32' && existsSync('C:/xampp/php/php.exe') ? 'C:/xampp/php/php.exe' : 'php');
 const command = process.argv[2];
 const commands = {
-  setup: ['scripts/setup-db.php'],
   test: ['tests/quiz.php'],
   public: ['-S', '127.0.0.1:8082', '-t', 'public'],
   dist: ['-S', '127.0.0.1:8082', '-t', 'dist', 'scripts/router.php'],

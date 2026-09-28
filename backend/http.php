@@ -42,5 +42,5 @@ function startQuizSession(): void
 set_exception_handler(function (Throwable $error): void {
     // No se registran nombres, correos, respuestas ni credenciales en los logs.
     error_log('Tienda quiz API failure: ' . get_class($error) . ' code=' . $error->getCode());
-    jsonResponse(['message' => 'Por ahora no pudimos guardar tu quiz. Intenta de nuevo en un momento; tus respuestas siguen aquí.'], 503);
+    jsonResponse(['message' => 'No pudimos confirmar el envío del diagnóstico. Tus respuestas siguen aquí; puedes reintentar.'], 503);
 });

@@ -13,7 +13,6 @@
     "build:xampp": "node scripts/build-xampp.mjs",
     "preview": "node scripts/php.mjs dist",
     "start": "node scripts/php.mjs dist",
-    "db:setup": "node scripts/php.mjs setup",
     "test": "node scripts/php.mjs test && node --test tests/scoring.test.ts",
     "test:api": "node --test tests/api.test.mjs",
     "check": "astro check"
