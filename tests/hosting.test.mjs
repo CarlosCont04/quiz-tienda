@@ -1,7 +1,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { spawn, spawnSync } from 'node:child_process';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve, sep } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { setTimeout } from 'node:timers/promises';
@@ -9,14 +9,39 @@ import { once } from 'node:events';
 import { createServer } from 'node:net';
 
 const php = process.env.PHP_BINARY || (existsSync('C:/xampp/php/php.exe') ? 'C:/xampp/php/php.exe' : 'php');
-let directory, server, base, serverError, logs = '';
+let directory, sourceDirectory, server, base, serverError, logs = '';
+
+function filesIn(root, prefix = '') {
+  return readdirSync(resolve(root, prefix), { withFileTypes: true }).flatMap(entry => {
+    const path = prefix ? `${prefix}/${entry.name}` : entry.name;
+    return entry.isDirectory() ? filesIn(root, path) : [path];
+  }).sort();
+}
 
 before(async () => {
   assert.ok(existsSync('artifacts/latest-hosting.json'), 'Ejecuta npm run build:hosting antes de esta prueba.');
   const release = JSON.parse(readFileSync('artifacts/latest-hosting.json', 'utf8'));
+  sourceDirectory = release.directory;
   mkdirSync('.runtime', { recursive: true });
   directory = mkdtempSync(resolve('.runtime/hosting-test-'));
-  cpSync(release.directory, directory, { recursive: true });
+  // Probar el ZIP entregable, no una copia del directorio previo a comprimir.
+  const listing = process.platform === 'win32'
+    ? spawnSync('tar.exe', ['-tf', release.archive], { encoding: 'utf8' })
+    : spawnSync('unzip', ['-Z1', release.archive], { encoding: 'utf8' });
+  assert.equal(listing.status, 0, listing.stderr || listing.error?.message);
+  const names = listing.stdout.trim().split(/\r?\n/);
+  for (const name of names) {
+    assert.ok(!/(^|\/)\.{1,2}(\/|$)|\\/.test(name), `Ruta incompatible en ZIP: ${name}`);
+    assert.ok(!/^(\/|[a-z]:)/i.test(name), `Ruta absoluta en ZIP: ${name}`);
+  }
+  // En Windows extraer con una implementación distinta a la usada para comprimir.
+  const extraction = process.platform === 'win32'
+    ? spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command',
+      'Expand-Archive -LiteralPath $env:QUIZ_TEST_ARCHIVE -DestinationPath $env:QUIZ_TEST_EXTRACT -ErrorAction Stop'], {
+      encoding: 'utf8', env: { ...process.env, QUIZ_TEST_ARCHIVE: release.archive, QUIZ_TEST_EXTRACT: directory },
+    })
+    : spawnSync('unzip', ['-q', release.archive, '-d', directory], { encoding: 'utf8' });
+  assert.equal(extraction.status, 0, extraction.stderr || extraction.error?.message);
   const probe = createServer();
   probe.listen(0, '127.0.0.1');
   await once(probe, 'listening');
@@ -48,6 +73,17 @@ after(async () => {
   }
   // Solo retirar la copia temporal creada por esta prueba, nunca una entrega.
   if (directory && directory.startsWith(resolve('.runtime') + sep)) rmSync(directory, { recursive: true, force: true });
+});
+
+test('el ZIP extraído conserva exactamente todos los archivos, incluidos los ocultos', () => {
+  const expected = filesIn(sourceDirectory);
+  // Las sesiones creadas durante las pruebas no son parte del paquete entregable.
+  const actual = filesIn(directory).filter(path => !path.startsWith('quiz-private/.runtime/sessions/sess_'));
+  assert.deepEqual(actual, expected);
+  for (const path of expected) assert.deepEqual(readFileSync(resolve(directory, path)), readFileSync(resolve(sourceDirectory, path)), path);
+  assert.ok(expected.includes('public_html/quiz/.htaccess'));
+  assert.ok(expected.includes('public_html/quiz/api/.htaccess'));
+  assert.ok(expected.includes('quiz-private/.runtime/sessions/.gitkeep'));
 });
 
 test('la página compilada utiliza /quiz/api/ y sus recursos públicos existen', async () => {

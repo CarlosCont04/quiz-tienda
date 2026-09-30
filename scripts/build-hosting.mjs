@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
 
@@ -47,9 +47,11 @@ writeFileSync(resolve(directory, 'VERSION.json'), JSON.stringify({
 }, null, 2) + '\n');
 
 const archive = resolve(release, 'quiz-hosting.zip');
+// Pasar nombres explícitos evita la entrada raíz ./ que algunos descompresores rechazan.
+const entries = readdirSync(directory).sort();
 const zip = process.platform === 'win32'
-  ? spawnSync('tar.exe', ['-a', '-c', '-f', archive, '-C', directory, '.'], { stdio: 'inherit' })
-  : spawnSync('zip', ['-q', '-r', archive, '.'], { cwd: directory, stdio: 'inherit' });
+  ? spawnSync('tar.exe', ['-a', '-c', '-f', archive, '-C', directory, ...entries], { stdio: 'inherit' })
+  : spawnSync('zip', ['-q', '-r', archive, ...entries], { cwd: directory, stdio: 'inherit' });
 if (zip.error) throw zip.error;
 if (zip.status !== 0) throw new Error('No se pudo crear el ZIP; revisa la carpeta package de esta entrega. Se requiere tar.exe en Windows o zip en Linux/macOS.');
 writeFileSync(resolve('artifacts/latest-hosting.json'), JSON.stringify({ directory, archive }, null, 2) + '\n');

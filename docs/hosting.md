@@ -27,9 +27,11 @@ npm.cmd run build:hosting
 npm.cmd run test:hosting
 ```
 
-Para compilar localmente se requiere Node.js 22.12 o posterior y la imagen real `src/assets/libro.webp`. Si proviene de una descarga de Git, ejecutar `git lfs pull` cuando corresponda. La prueba de instalación requiere PHP local. El empaquetado utiliza `tar.exe` (incluido en Windows 10/11) o `zip` en Linux/macOS.
+Para compilar localmente se requiere Node.js 22.12 o posterior y la imagen real `src/assets/libro.webp`. Si proviene de una descarga de Git, ejecutar `git lfs pull` cuando corresponda. La prueba de instalación requiere PHP local. El empaquetado utiliza `tar.exe` (incluido en Windows 10/11) o `zip` en Linux/macOS. `test:hosting` extrae el ZIP con PowerShell en Windows o `unzip` en Linux/macOS, compara cada archivo y prueba la aplicación extraída.
 
 Cada compilación crea una carpeta nueva en `artifacts/hosting-FECHA/`, con `quiz-hosting.zip` y su contenido descomprimido en `package/`. `artifacts/latest-hosting.json` identifica la entrega más reciente. **El ZIP no contiene claves de EmailJS ni sesiones locales.**
+
+Si un descompresor rechaza un ZIP anterior como «no válido», genera una entrega con el script actualizado: las rutas internas ya no llevan el prefijo `./`. También puedes subir directamente las carpetas de `package/`, que contienen los mismos archivos sin comprimir.
 
 ## 3. Respaldar y ubicar las carpetas
 
