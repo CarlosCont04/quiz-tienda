@@ -21,3 +21,5 @@ jobs:
       - run: npm test
       - run: npm run test:api
       - run: npm run build:xampp
+      - run: npm run build:hosting
+      - run: npm run test:hosting

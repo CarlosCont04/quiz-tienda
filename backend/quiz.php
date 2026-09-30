@@ -9,6 +9,7 @@ function quizDefinition(): array
 
 function validateSubmission(array $input): array
 {
+    if (!extension_loaded('mbstring')) throw new RuntimeException('Se requiere la extensión mbstring de PHP.', 1004);
     if (!is_string($input['name'] ?? null)) {
         throw new InvalidArgumentException('Escribe tu nombre para registrar tu resultado.');
     }

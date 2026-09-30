@@ -26,6 +26,8 @@ Completar las cuatro claves `emailjs_*` en el archivo local. No reemplazar un ar
 
 ## Desarrollo y publicación
 
+**Hosting en https://www.elquetengatienda.com/quiz/:** ejecutar `npm.cmd run build:hosting` y `npm.cmd run test:hosting`. El paquete completo aparece en `artifacts/hosting-FECHA/quiz-hosting.zip`; incluye la página pública, PHP, el cuestionario y las instrucciones, sin credenciales. Seguir [la guía detallada de instalación](docs/hosting.md). No publicar solo `dist.zip`: omite las dependencias privadas.
+
 ```powershell
 npm.cmd run dev
 ```
@@ -104,5 +106,7 @@ Las pruebas cubren reglas PHP, equivalencia con TypeScript y el flujo HTTP con u
 - `public/api/`: endpoints PHP.
 - `tests/`: reglas e integración simulada.
 - `docs/emailjs.md`: configuración y comprobación de entrega real.
+- `docs/hosting.md`: instalación en `/quiz/`, configuración privada y diagnóstico.
+- `scripts/build-hosting.mjs`: paquete de hosting con dependencias y sin claves.
 
 Los recursos binarios siguen administrados con Git LFS. Dependencias, salida compilada, configuración local y temporales permanecen excluidos de Git.

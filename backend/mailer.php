@@ -47,7 +47,7 @@ function sendQuizEmail(array $submission, array $result, ?callable $post = null)
     $config = config();
     foreach (['emailjs_service_id', 'emailjs_template_id', 'emailjs_public_key', 'emailjs_private_key'] as $key) {
         if (!is_string($config[$key]) || trim($config[$key]) === '') {
-            throw new RuntimeException('Falta configurar EmailJS.');
+            throw new RuntimeException('Falta configurar EmailJS.', 1005);
         }
     }
     $content = quizEmailContent($submission, $result);
@@ -74,7 +74,7 @@ function sendQuizEmail(array $submission, array $result, ?callable $post = null)
 
 function emailjsHttpPost(array $payload): array
 {
-    if (!extension_loaded('curl')) throw new RuntimeException('Se requiere la extensión cURL de PHP.');
+    if (!extension_loaded('curl')) throw new RuntimeException('Se requiere la extensión cURL de PHP.', 1006);
     $curl = curl_init('https://api.emailjs.com/api/v1.0/email/send');
     curl_setopt_array($curl, [
         CURLOPT_POST => true,
@@ -89,7 +89,10 @@ function emailjsHttpPost(array $payload): array
     ]);
     try {
         $body = curl_exec($curl);
-        if ($body === false) throw new RuntimeException('No se pudo confirmar el envío a EmailJS.');
+        if ($body === false) {
+            error_log('Tienda quiz EmailJS transport: curl_errno=' . curl_errno($curl));
+            throw new RuntimeException('No se pudo confirmar el envío a EmailJS.', 1007);
+        }
         return ['status' => (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE), 'body' => $body];
     } finally {
         curl_close($curl);

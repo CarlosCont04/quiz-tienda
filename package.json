@@ -11,10 +11,12 @@
     "dev:frontend": "astro dev --host 127.0.0.1",
     "build": "astro check && astro build",
     "build:xampp": "node scripts/build-xampp.mjs",
+    "build:hosting": "node scripts/build-hosting.mjs",
     "preview": "node scripts/php.mjs dist",
     "start": "node scripts/php.mjs dist",
     "test": "node scripts/php.mjs test && node --test tests/scoring.test.ts",
     "test:api": "node --test tests/api.test.mjs",
+    "test:hosting": "node --test tests/hosting.test.mjs",
     "check": "astro check"
   },
   "dependencies": {

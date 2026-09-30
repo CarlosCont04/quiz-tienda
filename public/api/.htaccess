@@ -1,0 +1,3 @@
+<FilesMatch "^(bootstrap|private-root)\.php$">
+  Require all denied
+</FilesMatch>

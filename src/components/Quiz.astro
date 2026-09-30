@@ -1,8 +1,9 @@
 ---
 import quiz from '../../shared/quiz.json';
 import Icon from './Icon.astro';
+const apiBase = `${import.meta.env.BASE_URL.replace(/\/+$/, '')}/api/`;
 ---
-<section id="quiz" class="quiz-card" aria-label="Test de Dependencia" data-api-base={`${import.meta.env.BASE_URL}api/`}>
+<section id="quiz" class="quiz-card" aria-label="Test de Dependencia" data-api-base={apiBase}>
   <div class="quiz-card-top"><span class="eyebrow">TEST DE DEPENDENCIA</span><span class="quiz-edition">12 preguntas</span></div>
   <div class="progress-meta"><span id="step-label">Pregunta 01 de 12</span><span id="answered-label">0 de 12 respondidas</span></div>
   <progress id="quiz-progress" value="0" max="12" aria-label="Preguntas respondidas">0 de 12</progress>

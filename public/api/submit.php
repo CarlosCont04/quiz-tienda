@@ -1,4 +1,5 @@
 <?php
 declare(strict_types=1);
-require_once dirname(__DIR__, 2) . '/backend/submission.php';
+$quizPrivateRoot = require __DIR__ . '/bootstrap.php';
+require_once $quizPrivateRoot . '/backend/submission.php';
 submitQuizRequest();
