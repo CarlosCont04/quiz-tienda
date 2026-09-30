@@ -3,8 +3,12 @@ import { loadEnv } from 'vite';
 
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), 'PUBLIC_');
 const rawBase = process.env.PUBLIC_BASE_PATH || env.PUBLIC_BASE_PATH || '/';
-const base = '/' + rawBase.split('/').filter(Boolean).join('/') + (rawBase === '/' ? '' : '/');
-const apiPrefix = `${base.replace(/\/$/, '')}/api`;
+
+// Se reestructuró la validación para evitar el slash final (trailing slash) exigido por Astro.
+const base = rawBase === '/' ? '/' : '/' + rawBase.split('/').filter(Boolean).join('/');
+
+// Se ajustó la concatenación del apiPrefix para evitar dobles slashes en la configuración del proxy.
+const apiPrefix = `${base === '/' ? '' : base}/api`;
 
 export default defineConfig({
   output: 'static',
