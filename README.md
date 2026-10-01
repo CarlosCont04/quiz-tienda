@@ -26,6 +26,8 @@ Completar las cuatro claves `emailjs_*` en el archivo local. No reemplazar un ar
 
 ## Desarrollo y publicación
 
+**Actualizar la landing ya configurada en HostGator con el botón PDF:** `npm.cmd run build:hosting` también genera `quiz-actualizacion-pdf.zip`, que incluye solo `index.html` y `_astro/`. Seguir [los pasos de actualización](docs/actualizacion-pdf-hostgator.md) para conservar `api/`, la ruta privada adaptada y las claves de EmailJS.
+
 **Hosting en https://www.elquetengatienda.com/quiz/:** ejecutar `npm.cmd run build:hosting` y `npm.cmd run test:hosting`. El paquete completo aparece en `artifacts/hosting-FECHA/quiz-hosting.zip`; incluye la página pública, PHP, el cuestionario y las instrucciones, sin credenciales. Seguir [la guía detallada de instalación](docs/hosting.md). No publicar solo `dist.zip`: omite las dependencias privadas.
 
 ```powershell
@@ -54,6 +56,8 @@ La vista previa está en http://127.0.0.1:8082/. En alojamiento, apuntar `Docume
 ## Flujo y puntuación
 
 El resultado aparece al terminar las doce preguntas. El usuario registra su nombre y acepta el envío en la ventana del resultado. El botón **Enviar mi diagnóstico** realiza el envío a EmailJS. Ver el resultado sin completar el registro no envía información. Si falla el envío, el resultado sigue visible y se puede reintentar. No se solicita correo al participante.
+
+**Descargar diagnóstico en PDF** genera un archivo local con resultado, cinco áreas, recomendaciones y respuestas. Está disponible después de «Por dónde empezar», antes de la invitación al diagnóstico. No requiere nombre, consentimiento para correo ni un envío previo. El generador jsPDF se carga al pulsar el botón; el documento contiene texto seleccionable y utiliza los mismos cálculos del cuestionario.
 
 Cada opción vale 0, 1, 2 o 3 puntos. El porcentaje es `round(puntaje / 36 × 100)`.
 

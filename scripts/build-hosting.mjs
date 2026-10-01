@@ -46,13 +46,25 @@ writeFileSync(resolve(directory, 'VERSION.json'), JSON.stringify({
   credentialsIncluded: false,
 }, null, 2) + '\n');
 
+function createZip(source, target) {
+  // Pasar nombres explícitos evita la entrada raíz ./ que algunos descompresores rechazan.
+  const entries = readdirSync(source).sort();
+  const zip = process.platform === 'win32'
+    ? spawnSync('tar.exe', ['-a', '-c', '-f', target, '-C', source, ...entries], { stdio: 'inherit' })
+    : spawnSync('zip', ['-q', '-r', target, ...entries], { cwd: source, stdio: 'inherit' });
+  if (zip.error) throw zip.error;
+  if (zip.status !== 0) throw new Error('No se pudo crear el ZIP; se requiere tar.exe en Windows o zip en Linux/macOS.');
+}
 const archive = resolve(release, 'quiz-hosting.zip');
-// Pasar nombres explícitos evita la entrada raíz ./ que algunos descompresores rechazan.
-const entries = readdirSync(directory).sort();
-const zip = process.platform === 'win32'
-  ? spawnSync('tar.exe', ['-a', '-c', '-f', archive, '-C', directory, ...entries], { stdio: 'inherit' })
-  : spawnSync('zip', ['-q', '-r', archive, ...entries], { cwd: directory, stdio: 'inherit' });
-if (zip.error) throw zip.error;
-if (zip.status !== 0) throw new Error('No se pudo crear el ZIP; revisa la carpeta package de esta entrega. Se requiere tar.exe en Windows o zip en Linux/macOS.');
-writeFileSync(resolve('artifacts/latest-hosting.json'), JSON.stringify({ directory, archive }, null, 2) + '\n');
-console.log(`\nPaquete: ${archive}\nSin credenciales. Sigue INSTRUCCIONES-HOSTING.md y ejecuta npm run test:hosting.`);
+createZip(directory, archive);
+
+// Actualización de una instalación ya configurada: solo HTML y recursos del navegador.
+const updateDirectory = resolve(release, 'actualizacion-quiz');
+mkdirSync(updateDirectory, { recursive: true });
+copyFileSync('dist/index.html', resolve(updateDirectory, 'index.html'));
+cpSync('dist/_astro', resolve(updateDirectory, '_astro'), { recursive: true });
+const updateArchive = resolve(release, 'quiz-actualizacion-pdf.zip');
+createZip(updateDirectory, updateArchive);
+copyFileSync('docs/actualizacion-pdf-hostgator.md', resolve(release, 'INSTRUCCIONES-ACTUALIZACION-PDF.md'));
+writeFileSync(resolve('artifacts/latest-hosting.json'), JSON.stringify({ directory, archive, updateDirectory, updateArchive }, null, 2) + '\n');
+console.log(`\nInstalación completa: ${archive}\nActualización de la landing existente: ${updateArchive}\nSigue INSTRUCCIONES-ACTUALIZACION-PDF.md y ejecuta npm run test:hosting.`);

@@ -9,7 +9,17 @@ import { once } from 'node:events';
 import { createServer } from 'node:net';
 
 const php = process.env.PHP_BINARY || (existsSync('C:/xampp/php/php.exe') ? 'C:/xampp/php/php.exe' : 'php');
-let directory, sourceDirectory, server, base, serverError, logs = '';
+let directory, sourceDirectory, updateDirectory, updateArchive, server, base, serverError, logs = '';
+
+function extractZip(archive, destination) {
+  const extraction = process.platform === 'win32'
+    ? spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command',
+      '$ErrorActionPreference = "Stop"; Add-Type -AssemblyName System.IO.Compression.FileSystem; [IO.Compression.ZipFile]::ExtractToDirectory($env:QUIZ_TEST_ARCHIVE, $env:QUIZ_TEST_EXTRACT)'], {
+      encoding: 'utf8', env: { ...process.env, QUIZ_TEST_ARCHIVE: archive, QUIZ_TEST_EXTRACT: destination },
+    })
+    : spawnSync('unzip', ['-q', archive, '-d', destination], { encoding: 'utf8' });
+  assert.equal(extraction.status, 0, extraction.stderr || extraction.error?.message);
+}
 
 function filesIn(root, prefix = '') {
   return readdirSync(resolve(root, prefix), { withFileTypes: true }).flatMap(entry => {
@@ -22,6 +32,8 @@ before(async () => {
   assert.ok(existsSync('artifacts/latest-hosting.json'), 'Ejecuta npm run build:hosting antes de esta prueba.');
   const release = JSON.parse(readFileSync('artifacts/latest-hosting.json', 'utf8'));
   sourceDirectory = release.directory;
+  updateArchive = release.updateArchive;
+  updateDirectory = release.updateDirectory;
   mkdirSync('.runtime', { recursive: true });
   directory = mkdtempSync(resolve('.runtime/hosting-test-'));
   // Probar el ZIP entregable, no una copia del directorio previo a comprimir.
@@ -35,13 +47,7 @@ before(async () => {
     assert.ok(!/^(\/|[a-z]:)/i.test(name), `Ruta absoluta en ZIP: ${name}`);
   }
   // En Windows extraer con una implementación distinta a la usada para comprimir.
-  const extraction = process.platform === 'win32'
-    ? spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command',
-      'Expand-Archive -LiteralPath $env:QUIZ_TEST_ARCHIVE -DestinationPath $env:QUIZ_TEST_EXTRACT -ErrorAction Stop'], {
-      encoding: 'utf8', env: { ...process.env, QUIZ_TEST_ARCHIVE: release.archive, QUIZ_TEST_EXTRACT: directory },
-    })
-    : spawnSync('unzip', ['-q', release.archive, '-d', directory], { encoding: 'utf8' });
-  assert.equal(extraction.status, 0, extraction.stderr || extraction.error?.message);
+  extractZip(release.archive, directory);
   const probe = createServer();
   probe.listen(0, '127.0.0.1');
   await once(probe, 'listening');
@@ -91,9 +97,36 @@ test('la página compilada utiliza /quiz/api/ y sus recursos públicos existen',
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /data-api-base="\/quiz\/api\/"/);
+  const recommendations = html.indexOf('class="next-step-panel"');
+  const download = html.indexOf('id="download-diagnosis"');
+  const invitation = html.indexOf('¿Quieres trabajar en lo que encontraste?');
+  assert.ok(recommendations < download && download < invitation);
+  assert.ok(html.includes('Descargar diagnóstico en PDF'));
   const assets = [...html.matchAll(/(?:src|href)="(\/quiz\/_astro\/[^\"]+)"/g)];
   assert.ok(assets.length >= 3);
   for (const [, path] of assets) assert.equal((await fetch(base + path)).status, 200, path);
+});
+
+test('el ZIP de actualización solo incluye index.html y _astro, sin configuración del hosting', () => {
+  assert.ok(updateArchive && existsSync(updateArchive));
+  const listing = process.platform === 'win32'
+    ? spawnSync('tar.exe', ['-tf', updateArchive], { encoding: 'utf8' })
+    : spawnSync('unzip', ['-Z1', updateArchive], { encoding: 'utf8' });
+  assert.equal(listing.status, 0, listing.stderr);
+  const files = listing.stdout.trim().split(/\r?\n/);
+  assert.ok(files.includes('index.html'));
+  assert.ok(files.some(file => file.endsWith('.js')));
+  for (const file of files) assert.ok(file === 'index.html' || file.startsWith('_astro/'), file);
+  const extracted = mkdtempSync(resolve('.runtime/update-test-'));
+  try {
+    extractZip(updateArchive, extracted);
+    assert.deepEqual(filesIn(extracted), filesIn(updateDirectory));
+    for (const file of filesIn(extracted)) {
+      assert.deepEqual(readFileSync(resolve(extracted, file)), readFileSync(resolve(updateDirectory, file)), file);
+    }
+  } finally {
+    if (extracted.startsWith(resolve('.runtime') + sep)) rmSync(extracted, { recursive: true, force: true });
+  }
 });
 
 test('la instalación crea y conserva una sesión usando la carpeta privada', async () => {
