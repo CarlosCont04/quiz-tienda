@@ -14,13 +14,14 @@
     "build:hosting": "node scripts/build-hosting.mjs",
     "preview": "node scripts/php.mjs dist",
     "start": "node scripts/php.mjs dist",
-    "test": "node scripts/php.mjs test && node --test tests/scoring.test.ts",
+    "test": "node scripts/php.mjs test && node --test tests/scoring.test.ts tests/diagnosis-pdf.test.ts",
     "test:api": "node --test tests/api.test.mjs",
     "test:hosting": "node --test tests/hosting.test.mjs",
     "check": "astro check"
   },
   "dependencies": {
-    "astro": "^7.3.1"
+    "astro": "^7.3.1",
+    "jspdf": "^4.2.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",

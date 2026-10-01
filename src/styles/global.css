@@ -154,6 +154,9 @@ meter::-moz-meter-bar { background: var(--brand-navy); }
 .next-step-panel .eyebrow { font-size: 10px; color: #8e5600; }
 .next-step-panel h3 { margin-top: 8px; font-size: 20px; }
 .next-step-panel p:not(.eyebrow) { margin-top: 12px; font-size: 15px; color: #485c6c; }
+.diagnosis-download { margin-top: 24px; text-align: center; }
+.diagnosis-download .button { max-width: 100%; }
+.diagnosis-download .small-text { margin-top: 10px; }
 .diagnosis-link { margin: 26px 0; text-align: center; }
 .diagnosis-link > p:first-child { font-size: 14px; margin-bottom: 12px; }
 .diagnosis-link .small-text { margin-top: 8px; }

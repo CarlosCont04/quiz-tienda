@@ -21,6 +21,10 @@ import Icon from './Icon.astro';
       </ul>
     </section>
     <section class="next-step-panel" aria-labelledby="critical-title"><p class="eyebrow">POR DÓNDE EMPEZAR</p><h3 id="critical-title"></h3><div id="critical-steps"></div></section>
+    <div class="diagnosis-download">
+      <button type="button" class="button button-primary" id="download-diagnosis"><Icon name="download" size={18} /><span id="download-label">Descargar diagnóstico en PDF</span></button>
+      <p id="download-status" class="small-text" role="status" aria-live="polite" hidden></p>
+    </div>
     <div class="diagnosis-link"><p>¿Quieres trabajar en lo que encontraste?</p><a class="button button-navy" href="https://www.elquetengatienda.com/">Conoce el Diagnóstico de Dependencia <Icon name="arrow" size={18} /></a><p class="small-text">Continúa en el sitio de El que tenga tienda.</p></div>
     <section class="registration" aria-labelledby="registration-title">
       <p class="eyebrow">REGISTRO DEL DIAGNÓSTICO</p><h3 id="registration-title">Envía este punto de partida a nuestro equipo.</h3>

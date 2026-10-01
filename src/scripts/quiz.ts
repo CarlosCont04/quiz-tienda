@@ -17,12 +17,16 @@ const error = element<HTMLParagraphElement>('#question-error');
 const status = element<HTMLParagraphElement>('#save-status');
 const save = element<HTMLButtonElement>('#save-result');
 const name = element<HTMLInputElement>('#participant-name');
+const download = element<HTMLButtonElement>('#download-diagnosis');
+const downloadLabel = element<HTMLElement>('#download-label');
+const downloadStatus = element<HTMLParagraphElement>('#download-status');
 const answers = new Map<number, number>();
 let current = 0;
 let completedAnswers: Answer[] = [];
 let requestId = '';
 let saving = false;
 let saved = false;
+let downloading = false;
 let csrfToken = '';
 let restoreFocus: HTMLElement | null = null;
 const apiBase = card.dataset.apiBase!;
@@ -120,15 +124,40 @@ dialog.addEventListener('close', () => {
 });
 element('#reopen-result').addEventListener('click', openResult);
 element('#restart-quiz').addEventListener('click', () => {
-  if (saving) return;
+  if (saving || downloading) return;
   answers.clear(); completedAnswers = []; requestId = ''; saved = false;
   form.reset(); registration.reset(); name.setCustomValidity('');
   registration.querySelectorAll<HTMLInputElement>('input').forEach(input => { input.disabled = false; });
   save.disabled = false; save.textContent = 'Enviar mi diagnóstico'; status.hidden = true;
+  downloadStatus.hidden = true;
   form.hidden = false; element('#quiz-complete').hidden = true;
   updateProgress(); showQuestion(0);
 });
 name.addEventListener('input', () => name.setCustomValidity(''));
+
+download.addEventListener('click', async () => {
+  if (downloading || completedAnswers.length !== definition.questions.length) return;
+  downloading = true; download.disabled = true; downloadLabel.textContent = 'Preparando PDF…';
+  downloadStatus.hidden = true;
+  download.setAttribute('aria-busy', 'true');
+  // Una copia fija conserva este diagnóstico mientras se carga el generador.
+  const snapshot = completedAnswers.map(answer => ({ ...answer }));
+  try {
+    const { createDiagnosisPdf, diagnosisFilename } = await import('./diagnosis-pdf');
+    const generatedAt = new Date();
+    await createDiagnosisPdf(snapshot, generatedAt).save(diagnosisFilename(generatedAt), { returnPromise: true });
+    downloadStatus.classList.remove('error-message');
+    downloadStatus.textContent = 'Tu diagnóstico en PDF está listo. Revisa las descargas de tu navegador.';
+  } catch {
+    downloadStatus.classList.add('error-message');
+    downloadStatus.textContent = 'No pudimos descargar el PDF. Intenta de nuevo; tu resultado sigue disponible.';
+  } finally {
+    downloading = false; download.disabled = false;
+    downloadLabel.textContent = 'Descargar diagnóstico en PDF';
+    download.removeAttribute('aria-busy');
+    downloadStatus.hidden = false;
+  }
+});
 
 async function fetchJson(path: string, options: RequestInit = {}) {
   const response = await fetch(`${apiBase}${path}`, { ...options, credentials: 'same-origin', signal: AbortSignal.timeout(15000) });
